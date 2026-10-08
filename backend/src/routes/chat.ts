@@ -59,7 +59,7 @@ chatRouter.post(
       "Content-Type": "text/event-stream; charset=utf-8",
       "Cache-Control": "no-cache, no-transform",
       Connection: "keep-alive",
-      "X-Accel-Buffering": "no", // evita que nginx (Elastic Beanstalk) acumule el stream
+      "X-Accel-Buffering": "no", // evita que un proxy intermedio acumule el stream
     });
     res.flushHeaders();
 

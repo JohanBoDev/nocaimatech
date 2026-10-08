@@ -1,0 +1,31 @@
+# Producción: la API de NocaimaTech en la EC2 compartida con Atlas.
+#
+# No publica puertos: el Caddy de Atlas (repo atlas-backend) termina el TLS de
+# api.nocaimatech.lat y la alcanza por la red de Docker de Atlas, que aquí se
+# declara externa. La base de datos vive en RDS (base `nocaimatech_prod`).
+#
+#   docker compose -f docker-compose.prod.yml up -d --build
+
+services:
+  nocaimatech-api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    image: nocaimatech-api:latest
+    container_name: nocaimatech-api
+    restart: unless-stopped
+    env_file: backend/.env
+    expose:
+      - '4000'
+    # La instancia (t4g.micro, ~900 MB) es de Atlas: este tope impide que un
+    # pico de NocaimaTech le quite la memoria a la otra API.
+    mem_limit: 256m
+    environment:
+      NODE_OPTIONS: --max-old-space-size=192
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
+    name: atlas-backend_atlas

@@ -1,0 +1,15 @@
+# Sitio de NocaimaTech para el Caddy de Atlas. En la EC2 se copia a
+# ~/caddy-sites/, que el Caddyfile de Atlas importa (`import sites/*.caddy`).
+# Requiere el registro A api.nocaimatech.lat -> IP elástica antes de recargar.
+
+api.nocaimatech.lat {
+	reverse_proxy nocaimatech-api:4000 {
+		# El cotizador responde por SSE: cada evento se envía al momento.
+		flush_interval -1
+	}
+
+	log {
+		output stdout
+		format console
+	}
+}
