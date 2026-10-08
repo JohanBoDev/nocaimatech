@@ -21,7 +21,7 @@
 | 1 | Monorepo + backend Express/TS + catálogo JSON + Prisma (Waitlist) | ✅ Hecha |
 | 2 | `POST /api/chat` con tool use (Claude) y streaming SSE | ✅ Hecha |
 | 3 | Frontend: landing, lista de espera, cotizador `/cotizador` | ✅ Hecha |
-| 4 | Despliegue en AWS (EC2 y RDS de Atlas + Amplify) | 🔄 En curso: falta Caddy, DNS de Amplify y API key |
+| 4 | Despliegue en AWS (EC2 y RDS de Atlas + Amplify) | ✅ Hecha (falta solo la API key de Anthropic) |
 
 ## Decisiones técnicas
 
@@ -127,28 +127,25 @@ npm run dev                           # http://localhost:4000/api/health
   flujo de chat completo contra el mock → tabla → botón WhatsApp con resumen
   correcto. `npm run build` y `npm run dev` de la raíz OK. README con despliegue.
 
-- **2026-10-08 — Fase 4 (en curso):** se descartó Elastic Beanstalk; la API
-  corre en Docker en la EC2 de Atlas (`i-092ae07ad496c27c1`, IP `98.91.152.171`),
-  en `~/nocaimatech`, contenedor `nocaimatech-api` (tope 256 MB, ~50 MB en uso)
-  unido a la red `atlas-backend_atlas`. Acceso por SSM (script de comandos, como Atlas).
-  BD `nocaimatech_prod` en la RDS `atlas-db`, usuario `nocaima` (sin CONNECT a
-  `atlas_prod`); snapshot previo `atlas-db-antes-nocaimatech-2026-10-08`.
-  TLS a RDS: Prisma 6 lee **un solo** certificado del PEM → el Dockerfile extrae
-  la raíz `RSA2048 G1` de us-east-1 (`sslcert` + `sslaccept=strict`). Migración OK.
-  Frontend en Amplify `d2tnmbh87gxu60` (zip manual, regla SPA), dominio asociado
-  y esperando DNS. `ANTHROPIC_API_KEY` vacía a propósito (chat → 503 amable).
-  **Falta:** (1) Caddy de Atlas: `git pull` en `~/atlas-backend` (commit 8f9479c),
-  copiar `deploy/caddy/nocaimatech.caddy` a `~/caddy-sites/` y
-  `docker compose -f docker-compose.prod.yml up -d --no-deps caddy`;
-  (2) registros en Namecheap (ALIAS @ y CNAME www → `d3vavwwple59h8.cloudfront.net`
-  + CNAME de validación ACM); (3) poner la API key y `docker compose up -d`.
+- **2026-10-08 — Fase 4:** se descartó Elastic Beanstalk; la API corre en
+  Docker en la EC2 de Atlas (`~/nocaimatech`, contenedor `nocaimatech-api`, tope
+  256 MB, ~50 MB en uso) y la sirve el Caddy de Atlas, que ahora importa
+  `~/caddy-sites/*.caddy` (commit `8f9479c` en atlas-backend). BD
+  `nocaimatech_prod` en la RDS `atlas-db`, usuario `nocaima` aislado; snapshot
+  previo `atlas-db-antes-nocaimatech-2026-10-08`. Dos tropiezos de TLS: `ADD
+  --chmod` dejó la carpeta de certificados ilegible, y Prisma 6 solo lee el
+  primer certificado del bundle → se extrae la raíz `RSA2048 G1`. Frontend en
+  Amplify `d2tnmbh87gxu60`, dominio en Namecheap. Verificado desde internet:
+  `nocaimatech.lat`, `www`, `/cotizador` 200; API con certificado de Let's
+  Encrypt, CORS correcto, lista de espera 201 (fila de prueba borrada), chat 503
+  amable (sin API key); Atlas `database: ok` antes y después.
 
 ## Pendientes / ideas futuras
 
 - [ ] Probar el cotizador con una `ANTHROPIC_API_KEY` real y ajustar el system
       prompt según las respuestas (`backend/src/chat/prompt.ts`).
-- [ ] Desplegar: BD (Neon/Supabase o RDS), backend en EB, frontend en Amplify,
-      dominio `nocaimatech.lat` + `api.nocaimatech.lat`.
+- [ ] Poner `ANTHROPIC_API_KEY` en `~/nocaimatech/backend/.env` de la EC2 y
+      `docker compose -f docker-compose.prod.yml up -d` (recrea el contenedor).
 - [ ] Revisar precios/stock reales del catálogo antes del lanzamiento.
 - [ ] `npm audit`: 3 alertas *high* en `deepmerge-ts` (dependencia interna del
       CLI de Prisma 6, no expuesta a usuarios). Revisar al subir de versión de Prisma.

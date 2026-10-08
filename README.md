@@ -126,44 +126,64 @@ valida con zod al arrancar) y reiniciar el backend.
 
 ## Despliegue en AWS
 
-### 1. Base de datos
+Comparte la infraestructura de Atlas (cuenta `798645002528`, perfil `atlas`,
+`us-east-1`). Costo adicional: prácticamente cero (Amplify con poco tráfico).
 
-- **Opción gratuita:** [Neon](https://neon.tech) o [Supabase](https://supabase.com)
-  (plan free). Copia la cadena de conexión con `?sslmode=require`.
-- **Opción AWS:** Amazon RDS for PostgreSQL (`db.t4g.micro`, capa gratuita el
-  primer año). Ponla en la misma VPC que Elastic Beanstalk y permite el puerto
-  5432 desde el security group de las instancias de EB.
+```
+nocaimatech.lat / www ──► Amplify (app d2tnmbh87gxu60, zip manual)
+api.nocaimatech.lat ──► IP elástica 98.91.152.171 (EC2 atlas-ec2)
+                         └─ Caddy de Atlas (TLS de Let's Encrypt)
+                              └─ contenedor nocaimatech-api ──► RDS atlas-db / nocaimatech_prod
+```
 
-### 2. Backend en Elastic Beanstalk
+**DNS** en Namecheap: `A api → 98.91.152.171`, `ALIAS @` y `CNAME www` →
+`d3vavwwple59h8.cloudfront.net`, más el CNAME de validación de ACM que da Amplify.
 
-1. Crea una aplicación en EB con la plataforma **Node.js 22 on Amazon Linux 2023**
-   (entorno *Web server*, instancia `t3.micro` o `t4g.micro`).
-2. En *Configuración → Variables de entorno* define `ANTHROPIC_API_KEY`,
-   `MODEL_CHAT`, `CHAT_EFFORT`, `DATABASE_URL` y
-   `FRONTEND_URL=https://nocaimatech.lat,https://www.nocaimatech.lat`.
-3. Genera el paquete y súbelo como nueva versión:
-   ```bash
-   npm run bundle:eb -w backend      # crea backend-eb.zip en la raíz
-   ```
-   EB ejecuta `npm install` (que corre `prisma generate`). El hook
-   `.platform/hooks/predeploy/01_prisma_migrate.sh` aplica las migraciones y el
-   `Procfile` arranca con `npm start`.
-4. HTTPS: agrega un certificado de ACM al balanceador (o usa CloudFront) y crea
-   el registro `api.nocaimatech.lat` en tu DNS apuntando al entorno.
-5. El streaming funciona detrás de nginx gracias al encabezado
-   `X-Accel-Buffering: no`. Si usas balanceador, sube el *idle timeout* a 120 s.
+### Base de datos
 
-### 3. Frontend en AWS Amplify Hosting
+Base `nocaimatech_prod` en la RDS de Atlas, con su propio usuario `nocaima`
+(sin permiso de conexión a `atlas_prod`). La `DATABASE_URL` del `.env` del
+servidor (`~/nocaimatech/backend/.env`, permisos 600) lleva:
 
-1. *New app → Host web app* y conecta este repositorio (rama de producción).
-2. Amplify detecta `amplify.yml` (monorepo con `appRoot: frontend`).
-3. Variables de entorno: `VITE_API_URL=https://api.nocaimatech.lat` y
-   `VITE_WHATSAPP=57XXXXXXXXXX`.
-4. *Rewrites and redirects* → agrega la regla SPA para que `/cotizador` funcione
-   al recargar:
-   - Source: `</^[^.]+$|\.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|woff2|ttf|map|json|webp)$)([^.]+$)/>`
-   - Target: `/index.html` · Type: `200 (Rewrite)`
-5. *Domain management* → conecta `nocaimatech.lat` y `www`.
+```
+?schema=public&sslmode=require&sslcert=/app/certs/rds-ca.pem&sslaccept=strict
+```
+
+RDS exige TLS. El motor de Prisma 6 solo lee **el primer** certificado de un
+PEM, así que el `Dockerfile` extrae del bundle de us-east-1 la raíz que usa la
+instancia (`RSA2048 G1`). Si la CA de la instancia cambia, se ajusta
+`RDS_CA_SUBJECT`.
+
+### Backend (EC2, Docker)
+
+A la EC2 se entra por SSM (`aws ssm send-command`), no por SSH. Los comandos
+corren como root: lo que toque el repo va con `sudo -iu ubuntu`.
+
+```bash
+sudo -iu ubuntu bash -c 'cd ~/nocaimatech && git pull --ff-only'
+cd /home/ubuntu/nocaimatech
+docker compose -f docker-compose.prod.yml build
+docker compose -f docker-compose.prod.yml run --rm nocaimatech-api npx prisma migrate deploy   # si hay migraciones
+docker compose -f docker-compose.prod.yml up -d
+```
+
+El contenedor no publica puertos y tiene un tope de 256 MB para no quitarle
+memoria a Atlas. Caddy (repo `atlas-backend`) importa `~/caddy-sites/*.caddy`;
+el sitio está en `deploy/caddy/nocaimatech.caddy` (si cambia, se copia allí y se
+recarga con `docker exec atlas-caddy caddy reload --config /etc/caddy/Caddyfile`).
+
+### Frontend (Amplify)
+
+```bash
+VITE_API_URL=https://api.nocaimatech.lat VITE_WHATSAPP=573224395306 npm run build -w frontend
+# zip de frontend/dist CON entradas de directorio (Compress-Archive no sirve)
+aws amplify create-deployment --profile atlas --app-id d2tnmbh87gxu60 --branch-name main
+curl -X PUT --data-binary @dist.zip "<zipUploadUrl>"
+aws amplify start-deployment --profile atlas --app-id d2tnmbh87gxu60 --branch-name main --job-id <id>
+```
+
+La app ya tiene la regla SPA (todo lo que no sea un archivo estático → `/index.html`).
+Si el backend cambia de contrato, se despliega **primero** el backend.
 
 ## Seguridad y costos
 
