@@ -21,7 +21,7 @@
 | 1 | Monorepo + backend Express/TS + catálogo JSON + Prisma (Waitlist) | ✅ Hecha |
 | 2 | `POST /api/chat` con tool use (Claude) y streaming SSE | ✅ Hecha |
 | 3 | Frontend: landing, lista de espera, cotizador `/cotizador` | ✅ Hecha |
-| 4 | Despliegue real en AWS + prueba con API key real | ⏳ Pendiente |
+| 4 | Despliegue en AWS (EC2 y RDS de Atlas + Amplify) | 🔄 En curso: falta Caddy, DNS de Amplify y API key |
 
 ## Decisiones técnicas
 
@@ -126,6 +126,22 @@ npm run dev                           # http://localhost:4000/api/health
   con Playwright (escritorio 1440 px y móvil 390 px, sin errores de consola):
   flujo de chat completo contra el mock → tabla → botón WhatsApp con resumen
   correcto. `npm run build` y `npm run dev` de la raíz OK. README con despliegue.
+
+- **2026-10-08 — Fase 4 (en curso):** se descartó Elastic Beanstalk; la API
+  corre en Docker en la EC2 de Atlas (`i-092ae07ad496c27c1`, IP `98.91.152.171`),
+  en `~/nocaimatech`, contenedor `nocaimatech-api` (tope 256 MB, ~50 MB en uso)
+  unido a la red `atlas-backend_atlas`. Acceso por SSM (script de comandos, como Atlas).
+  BD `nocaimatech_prod` en la RDS `atlas-db`, usuario `nocaima` (sin CONNECT a
+  `atlas_prod`); snapshot previo `atlas-db-antes-nocaimatech-2026-10-08`.
+  TLS a RDS: Prisma 6 lee **un solo** certificado del PEM → el Dockerfile extrae
+  la raíz `RSA2048 G1` de us-east-1 (`sslcert` + `sslaccept=strict`). Migración OK.
+  Frontend en Amplify `d2tnmbh87gxu60` (zip manual, regla SPA), dominio asociado
+  y esperando DNS. `ANTHROPIC_API_KEY` vacía a propósito (chat → 503 amable).
+  **Falta:** (1) Caddy de Atlas: `git pull` en `~/atlas-backend` (commit 8f9479c),
+  copiar `deploy/caddy/nocaimatech.caddy` a `~/caddy-sites/` y
+  `docker compose -f docker-compose.prod.yml up -d --no-deps caddy`;
+  (2) registros en Namecheap (ALIAS @ y CNAME www → `d3vavwwple59h8.cloudfront.net`
+  + CNAME de validación ACM); (3) poner la API key y `docker compose up -d`.
 
 ## Pendientes / ideas futuras
 
