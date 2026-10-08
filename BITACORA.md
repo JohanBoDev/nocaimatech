@@ -19,7 +19,7 @@
 | Fase | Descripción | Estado |
 |------|-------------|--------|
 | 1 | Monorepo + backend Express/TS + catálogo JSON + Prisma (Waitlist) | ✅ Hecha |
-| 2 | `POST /api/chat` con tool use (Claude) y streaming SSE | ⏳ Pendiente |
+| 2 | `POST /api/chat` con tool use (Claude) y streaming SSE | ✅ Hecha |
 | 3 | Frontend: landing, lista de espera, cotizador `/cotizador` | ⏳ Pendiente |
 
 ## Decisiones técnicas
@@ -45,6 +45,28 @@
 - **Rate limit** también en `/api/waitlist` (10 cada 15 min por IP).
   `trust proxy = 1` para IP real detrás del balanceador de EB.
 
+- **Chat (`src/chat/`)**: bucle manual de tool use con `client.beta.messages.stream`
+  (máx. 8 vueltas, `max_tokens` 8192). Herramientas en `tools.ts`
+  (`buscar_productos`, `verificar_compatibilidad`) con `eager_input_streaming` y
+  validación zod del input antes de ejecutar. System prompt en `prompt.ts`
+  (texto estable, sin fechas, para no romper la caché).
+- **Modelo**: `MODEL_CHAT` (por defecto `claude-opus-5-5`). `CHAT_EFFORT`
+  (por defecto `low`) controla costo/profundidad. En Opus 5.5 el thinking es
+  adaptativo siempre (no se envía `thinking`).
+- **Fallback ante rechazos**: para Opus 5.5/5, Fable 5.1 y Sonnet 5.5 se envía
+  `fallbacks: "default"` con beta `server-side-fallback-2026-07-01`. Si el
+  `stop_reason` final es `refusal` → mensaje amigable.
+- **Contrato SSE de `/api/chat`** (líneas `data: {json}`):
+  `{type:"text",text}` · `{type:"status",message}` (p. ej. "Buscando
+  procesadores…") · `{type:"done"}` · `{type:"error",message}`. Ping `: ping`
+  cada 15 s. Errores previos al stream → JSON `{error}` con 400/429/503.
+- **Validación `/api/chat`**: máx. 20 mensajes, usuario ≤ 1000 caracteres,
+  asistente ≤ 8000, alternados, empieza y termina en usuario. Rate limit 20/15 min/IP.
+- El historial vive solo en el navegador: se envían únicamente textos
+  (sin bloques de thinking/tool), así no hay nada que "editar" entre turnos.
+- La tabla final siempre termina en una fila **Total**: el frontend la usa
+  para mostrar el botón "Continuar por WhatsApp".
+
 ## Cómo verificar rápido
 
 ```bash
@@ -59,6 +81,13 @@ npm run dev                           # http://localhost:4000/api/health
 - **2026-10-08 — Fase 1:** estructura monorepo, backend con catálogo, Prisma +
   migración `init`, endpoint `POST /api/waitlist`, `GET /api/health`.
   Verificado: build OK, 201 / 409 duplicado / 400 validación.
+
+- **2026-10-08 — Fase 2:** `POST /api/chat` con tool use + SSE. Verificado
+  contra un mock de la API (vía `ANTHROPIC_BASE_URL`): 3 vueltas con
+  herramientas en paralelo, eventos status/text/done; errores 400 (1001
+  caracteres, 21 mensajes, orden), 503 sin API key, 429 tras 20 peticiones,
+  CORS solo para FRONTEND_URL, error amigable si la API no responde.
+  ⚠️ Aún no probado con una API key real.
 
 ## Pendientes / ideas futuras
 
