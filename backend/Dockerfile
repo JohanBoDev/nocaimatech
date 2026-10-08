@@ -16,6 +16,10 @@ RUN npm ci -w backend
 COPY backend/tsconfig.json backend/
 COPY backend/src backend/src
 RUN npm run build -w backend
+# RDS exige TLS y su CA no viene en Alpine: sin este bundle no se puede verificar
+# el certificado del servidor (ver DATABASE_URL en el README).
+RUN mkdir -p /app/certs && \
+    wget -qO /app/certs/rds-ca.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
 
 # --- runtime: solo dependencias de producción ---
 FROM node:22-alpine
@@ -32,9 +36,7 @@ COPY backend/prisma backend/prisma
 RUN npm ci -w backend --omit=dev && npm cache clean --force
 COPY --from=builder /app/backend/dist backend/dist
 COPY backend/data backend/data
-# RDS exige TLS y su CA no viene en Alpine: sin este bundle no se puede verificar
-# el certificado del servidor (ver DATABASE_URL en DESPLIEGUE.md).
-ADD --chmod=644 https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem /app/certs/rds-ca.pem
+COPY --from=builder /app/certs /app/certs
 USER node
 WORKDIR /app/backend
 EXPOSE 4000
