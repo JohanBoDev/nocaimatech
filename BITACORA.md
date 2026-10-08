@@ -20,7 +20,8 @@
 |------|-------------|--------|
 | 1 | Monorepo + backend Express/TS + catálogo JSON + Prisma (Waitlist) | ✅ Hecha |
 | 2 | `POST /api/chat` con tool use (Claude) y streaming SSE | ✅ Hecha |
-| 3 | Frontend: landing, lista de espera, cotizador `/cotizador` | ⏳ Pendiente |
+| 3 | Frontend: landing, lista de espera, cotizador `/cotizador` | ✅ Hecha |
+| 4 | Despliegue real en AWS + prueba con API key real | ⏳ Pendiente |
 
 ## Decisiones técnicas
 
@@ -67,6 +68,36 @@
 - La tabla final siempre termina en una fila **Total**: el frontend la usa
   para mostrar el botón "Continuar por WhatsApp".
 
+### Frontend y diseño
+
+- **Dirección visual (pedida por Johan):** landing al estilo de las de **Claude**
+  (serif editorial + sans, grises cálidos, producto mostrado en grande, FAQ) y
+  **OpenClaw** (fondo oscuro con cielo de puntos, un acento con personalidad).
+  También se siguieron `anthropics/skills → frontend-design` y
+  `vercel-labs/web-interface-guidelines`. **Todo está en `frontend/DESIGN.md`**;
+  leerlo antes de tocar la UI. No usar el acento clay de Anthropic ni degradados
+  violeta/cian (se descartó un primer intento "genérico" y luego uno tipo PCB verde).
+- Fuentes: Newsreader (titulares, clase `.title`), Geist (cuerpo), Geist Mono (solo
+  la URL del mock). Acento único ámbar `#E2A84B`.
+- Botones compartidos en `components/ui.ts`. Placa animada `BoardCompat`
+  (único movimiento, arranca con IntersectionObserver, respeta reduced-motion).
+- Rutas: `/` (Landing), `/cotizador` (lazy), `*` (404). React Router 7.
+- Cotizador: historial en estado de React; Enter envía; si falla, "Reintentar";
+  límite de 20 mensajes con aviso; `beforeunload` si hay conversación;
+  auto-scroll solo si la persona está al final.
+- WhatsApp: `lib/cotizacion.ts` detecta la fila **Total** de la tabla y arma el
+  resumen (viñetas + total) para `wa.me/<VITE_WHATSAPP>?text=…`. Si
+  `VITE_WHATSAPP` está vacío, los botones de WhatsApp no se muestran.
+- Vite redirige `/api` → `localhost:4000` en desarrollo.
+
+### Despliegue
+
+- `amplify.yml` (raíz, `appRoot: frontend`, `npm ci --prefix ..` por workspaces).
+  Falta en consola: variables `VITE_API_URL`/`VITE_WHATSAPP` y regla SPA (ver README).
+- Backend EB: `npm run bundle:eb -w backend` → `backend-eb.zip` (dist, data,
+  prisma, Procfile, `.platform/hooks/predeploy/01_prisma_migrate.sh`).
+  `prisma` va en dependencies para `postinstall: prisma generate`.
+
 ## Cómo verificar rápido
 
 ```bash
@@ -89,6 +120,22 @@ npm run dev                           # http://localhost:4000/api/health
   CORS solo para FRONTEND_URL, error amigable si la API no responde.
   ⚠️ Aún no probado con una API key real.
 
+- **2026-10-08 — Fase 3:** landing completa + cotizador + lista de espera.
+  Johan pidió a mitad de fase un diseño no genérico, al estilo de las landings
+  de Claude/OpenClaw → rediseño completo (ver `frontend/DESIGN.md`). Verificado
+  con Playwright (escritorio 1440 px y móvil 390 px, sin errores de consola):
+  flujo de chat completo contra el mock → tabla → botón WhatsApp con resumen
+  correcto. `npm run build` y `npm run dev` de la raíz OK. README con despliegue.
+
 ## Pendientes / ideas futuras
 
-- (Fase 2 y 3 en curso)
+- [ ] Probar el cotizador con una `ANTHROPIC_API_KEY` real y ajustar el system
+      prompt según las respuestas (`backend/src/chat/prompt.ts`).
+- [ ] Desplegar: BD (Neon/Supabase o RDS), backend en EB, frontend en Amplify,
+      dominio `nocaimatech.lat` + `api.nocaimatech.lat`.
+- [ ] Revisar precios/stock reales del catálogo antes del lanzamiento.
+- [ ] `npm audit`: 3 alertas *high* en `deepmerge-ts` (dependencia interna del
+      CLI de Prisma 6, no expuesta a usuarios). Revisar al subir de versión de Prisma.
+- [ ] Ideas: imagen OG para redes, analítica respetuosa (Plausible/Umami),
+      panel simple para ver la lista de espera, tests (vitest) de
+      `verificarCompatibilidad` y `resumenParaWhatsApp`.

@@ -11,7 +11,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
     "prisma:generate": "prisma generate",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "bundle:eb": "npm run build && rm -f ../backend-eb.zip && zip -r ../backend-eb.zip dist data prisma package.json Procfile .platform -x \"*.map\""
   },
   "engines": {
     "node": ">=20.6"

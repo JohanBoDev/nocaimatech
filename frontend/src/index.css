@@ -1,0 +1,126 @@
+@import "tailwindcss";
+
+/*
+ * Paleta oscura de grises cálidos (inspirada en las landings de Claude y OpenClaw)
+ * con un único acento ámbar "panela". Ver DESIGN.md.
+ */
+@theme {
+  --font-serif: "Newsreader", ui-serif, Georgia, serif;
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+
+  --color-bg: #131211;
+  --color-surface: #1c1b19;
+  --color-surface-2: #252420;
+  --color-line: #33312c;
+  --color-ink: #f0eee6;
+  --color-ink-dim: #a5a297;
+  --color-ink-faint: #75726a;
+  --color-accent: #e2a84b;
+  --color-accent-hi: #f0bd66;
+  --color-ok: #86c19f;
+  --color-fault: #e8806f;
+}
+
+:root {
+  color-scheme: dark;
+  -webkit-tap-highlight-color: rgb(226 168 75 / 0.2);
+}
+
+@media (pointer: fine) {
+  html { overscroll-behavior: none; }
+}
+
+body {
+  @apply bg-bg font-sans text-ink antialiased;
+}
+
+/* Titulares editoriales en serif */
+.title {
+  font-family: var(--font-serif);
+  font-weight: 450;
+  letter-spacing: -0.02em;
+  line-height: 1.04;
+  text-wrap: balance;
+}
+
+h2, h3, p { text-wrap: pretty; }
+section[id] { scroll-margin-top: 5rem; }
+a, button, input, select, textarea, summary { touch-action: manipulation; }
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.tnum { font-variant-numeric: tabular-nums; }
+
+/* Cielo de puntos del hero (guiño a OpenClaw), estático */
+.stars {
+  background-image:
+    radial-gradient(1px 1px at 12% 22%, rgb(240 238 230 / 0.35) 50%, transparent 51%),
+    radial-gradient(1px 1px at 78% 14%, rgb(240 238 230 / 0.25) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 64% 38%, rgb(226 168 75 / 0.5) 50%, transparent 51%),
+    radial-gradient(1px 1px at 32% 8%, rgb(240 238 230 / 0.3) 50%, transparent 51%),
+    radial-gradient(1px 1px at 90% 46%, rgb(240 238 230 / 0.2) 50%, transparent 51%),
+    radial-gradient(1px 1px at 6% 52%, rgb(240 238 230 / 0.25) 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 22% 40%, rgb(240 238 230 / 0.2) 50%, transparent 51%),
+    radial-gradient(1px 1px at 48% 18%, rgb(240 238 230 / 0.3) 50%, transparent 51%);
+}
+
+/* Animación de la placa (un único momento orquestado) */
+.pcb-trace {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: route 900ms cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  animation-delay: var(--delay);
+}
+.pcb-reveal {
+  opacity: 0;
+  animation: power 400ms ease-out forwards;
+  animation-delay: var(--delay);
+}
+@keyframes route { to { stroke-dashoffset: 0; } }
+@keyframes power { to { opacity: 1; } }
+
+.typing-dot { animation: typing 1.2s ease-in-out infinite; }
+.typing-dot:nth-child(2) { animation-delay: 0.15s; }
+.typing-dot:nth-child(3) { animation-delay: 0.3s; }
+@keyframes typing { 0%, 60%, 100% { opacity: 0.25; } 30% { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .pcb-trace { animation: none; stroke-dashoffset: 0; }
+  .pcb-reveal { animation: none; opacity: 1; }
+  .typing-dot { animation: none; opacity: 0.7; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+/* Respuestas del asesor (Markdown) */
+.chat-md > :first-child { margin-top: 0; }
+.chat-md > :last-child { margin-bottom: 0; }
+.chat-md p { margin-block: 0.6rem; line-height: 1.65; }
+.chat-md ul { margin-block: 0.6rem; padding-left: 1.25rem; list-style: disc; }
+.chat-md ol { margin-block: 0.6rem; padding-left: 1.25rem; list-style: decimal; }
+.chat-md li + li { margin-top: 0.3rem; }
+.chat-md li::marker { color: var(--color-accent); }
+.chat-md strong { font-weight: 600; color: var(--color-ink); }
+.chat-md a { color: var(--color-accent); text-decoration: underline; text-underline-offset: 3px; }
+.chat-md h1, .chat-md h2, .chat-md h3 { font-family: var(--font-serif); font-size: 1.25rem; margin-block: 0.8rem 0.4rem; }
+
+/* Tabla de cotización */
+.chat-md .cot { margin-block: 0.9rem; overflow-x: auto; border: 1px solid var(--color-line); border-radius: 12px; background: var(--color-bg); }
+.chat-md table { width: 100%; border-collapse: collapse; font-size: 0.875rem; font-variant-numeric: tabular-nums; }
+.chat-md th { text-align: left; font-weight: 500; color: var(--color-ink-dim); padding: 0.65rem 0.85rem; border-bottom: 1px solid var(--color-line); white-space: nowrap; }
+.chat-md td { padding: 0.65rem 0.85rem; border-bottom: 1px solid rgb(51 49 44 / 0.6); vertical-align: top; }
+.chat-md th:last-child, .chat-md td:last-child { text-align: right; white-space: nowrap; }
+.chat-md td:first-child { color: var(--color-ink-dim); white-space: nowrap; }
+.chat-md tr:last-child td { border-bottom: 0; background: rgb(226 168 75 / 0.08); color: var(--color-accent-hi); font-weight: 600; }
+
+@media (max-width: 480px) {
+  .chat-md table { font-size: 0.8125rem; }
+  .chat-md th, .chat-md td { padding: 0.55rem 0.6rem; }
+  .chat-md td:first-child { white-space: normal; min-width: 5.5rem; }
+}
