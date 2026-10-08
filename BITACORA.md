@@ -144,11 +144,13 @@ npm run dev                           # http://localhost:4000/api/health
 
 - [ ] Probar el cotizador con una `ANTHROPIC_API_KEY` real y ajustar el system
       prompt según las respuestas (`backend/src/chat/prompt.ts`).
-- [ ] Cotizador en producción: el `.env` de la EC2 ya tiene una clave
-      `sk-ant-usr-…` y `MODEL_CHAT=claude-haiku-4-5` (el más barato, pedido por
-      Johan; `CHAT_EFFORT` vacío porque Haiku 4.5 no acepta effort). La API la
-      rechaza sin `anthropic-workspace-id` → falta poner `ANTHROPIC_WORKSPACE_ID`
-      (o cambiar a una clave de workspace) y `docker compose ... up -d`.
+- [x] Cotizador en producción con Haiku 4.5 (`claude-haiku-4-5`, el más barato,
+      pedido por Johan; `CHAT_EFFORT` vacío porque Haiku no acepta effort) y la
+      segunda clave `sk-ant-usr-…` (sí ligada a workspace). Verificado: 6
+      búsquedas en paralelo, compatibilidad, tabla con fila Total, `done`.
+- [ ] Ajustar el prompt para Haiku: narra sus errores en el texto («espera,
+      déjame revisar»), se pasó del presupuesto (3.052.000 sobre 3.000.000) y usó
+      «¿Te late?» (mexicano, no colombiano). Rotar las claves pegadas en el chat.
 - [ ] Revisar precios/stock reales del catálogo antes del lanzamiento.
 - [ ] `npm audit`: 3 alertas *high* en `deepmerge-ts` (dependencia interna del
       CLI de Prisma 6, no expuesta a usuarios). Revisar al subir de versión de Prisma.
