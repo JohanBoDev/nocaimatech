@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Interes {
+  COMPONENTES
+  WEB
+  AMBOS
+}
+
+/// Lista de espera (única tabla de la base de datos en esta versión)
+model Waitlist {
+  id        Int      @id @default(autoincrement())
+  nombre    String   @db.VarChar(100)
+  email     String   @unique @db.VarChar(254)
+  interes   Interes
+  createdAt DateTime @default(now())
+}

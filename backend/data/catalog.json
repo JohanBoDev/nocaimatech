@@ -1,0 +1,241 @@
+{
+  "moneda": "COP",
+  "actualizado": "2026-10-08",
+  "nota": "Precios de referencia del mercado colombiano (IVA incluido). Pueden variar; se confirman al cerrar la cotización.",
+  "productos": [
+    {
+      "id": "cpu-r5-5600g",
+      "nombre": "AMD Ryzen 5 5600G (6 núcleos, gráficos Radeon integrados)",
+      "categoria": "CPU",
+      "marca": "AMD",
+      "precioCOP": 489000,
+      "stock": 12,
+      "specs": { "socket": "AM4", "tdpW": 65, "graficosIntegrados": true, "gama": "baja" }
+    },
+    {
+      "id": "cpu-i5-12400f",
+      "nombre": "Intel Core i5-12400F (6 núcleos, sin gráficos integrados)",
+      "categoria": "CPU",
+      "marca": "Intel",
+      "precioCOP": 529000,
+      "stock": 9,
+      "specs": { "socket": "LGA1700", "tdpW": 117, "graficosIntegrados": false, "gama": "baja" }
+    },
+    {
+      "id": "cpu-r5-7600",
+      "nombre": "AMD Ryzen 5 7600 (6 núcleos, AM5)",
+      "categoria": "CPU",
+      "marca": "AMD",
+      "precioCOP": 869000,
+      "stock": 8,
+      "specs": { "socket": "AM5", "tdpW": 88, "graficosIntegrados": true, "gama": "media" }
+    },
+    {
+      "id": "cpu-r7-7800x3d",
+      "nombre": "AMD Ryzen 7 7800X3D (8 núcleos, 3D V-Cache)",
+      "categoria": "CPU",
+      "marca": "AMD",
+      "precioCOP": 1949000,
+      "stock": 4,
+      "specs": { "socket": "AM5", "tdpW": 120, "graficosIntegrados": true, "gama": "alta" }
+    },
+    {
+      "id": "cpu-i7-14700k",
+      "nombre": "Intel Core i7-14700K (20 núcleos)",
+      "categoria": "CPU",
+      "marca": "Intel",
+      "precioCOP": 1899000,
+      "stock": 3,
+      "specs": { "socket": "LGA1700", "tdpW": 253, "graficosIntegrados": true, "gama": "alta" }
+    },
+    {
+      "id": "gpu-rx6600",
+      "nombre": "Tarjeta de video AMD Radeon RX 6600 8 GB",
+      "categoria": "GPU",
+      "marca": "XFX",
+      "precioCOP": 1049000,
+      "stock": 7,
+      "specs": { "tdpW": 132, "vramGB": 8, "psuRecomendadaW": 450, "gama": "baja" }
+    },
+    {
+      "id": "gpu-rtx4060",
+      "nombre": "Tarjeta de video NVIDIA GeForce RTX 4060 8 GB",
+      "categoria": "GPU",
+      "marca": "MSI",
+      "precioCOP": 1399000,
+      "stock": 10,
+      "specs": { "tdpW": 115, "vramGB": 8, "psuRecomendadaW": 550, "gama": "media" }
+    },
+    {
+      "id": "gpu-rx7800xt",
+      "nombre": "Tarjeta de video AMD Radeon RX 7800 XT 16 GB",
+      "categoria": "GPU",
+      "marca": "Sapphire",
+      "precioCOP": 2749000,
+      "stock": 3,
+      "specs": { "tdpW": 263, "vramGB": 16, "psuRecomendadaW": 700, "gama": "alta" }
+    },
+    {
+      "id": "gpu-rtx5070",
+      "nombre": "Tarjeta de video NVIDIA GeForce RTX 5070 12 GB",
+      "categoria": "GPU",
+      "marca": "ASUS",
+      "precioCOP": 3199000,
+      "stock": 2,
+      "specs": { "tdpW": 250, "vramGB": 12, "psuRecomendadaW": 650, "gama": "alta" }
+    },
+    {
+      "id": "ram-ddr4-16-3200",
+      "nombre": "Memoria RAM Kingston Fury Beast 16 GB (2x8) DDR4 3200 MHz",
+      "categoria": "RAM",
+      "marca": "Kingston",
+      "precioCOP": 229000,
+      "stock": 20,
+      "specs": { "ramType": "DDR4", "capacidadGB": 16, "velocidadMHz": 3200, "tdpW": 6 }
+    },
+    {
+      "id": "ram-ddr4-32-3200",
+      "nombre": "Memoria RAM Corsair Vengeance LPX 32 GB (2x16) DDR4 3200 MHz",
+      "categoria": "RAM",
+      "marca": "Corsair",
+      "precioCOP": 419000,
+      "stock": 11,
+      "specs": { "ramType": "DDR4", "capacidadGB": 32, "velocidadMHz": 3200, "tdpW": 8 }
+    },
+    {
+      "id": "ram-ddr5-16-5600",
+      "nombre": "Memoria RAM Kingston Fury Beast 16 GB (2x8) DDR5 5600 MHz",
+      "categoria": "RAM",
+      "marca": "Kingston",
+      "precioCOP": 389000,
+      "stock": 14,
+      "specs": { "ramType": "DDR5", "capacidadGB": 16, "velocidadMHz": 5600, "tdpW": 8 }
+    },
+    {
+      "id": "ram-ddr5-32-6000",
+      "nombre": "Memoria RAM Corsair Vengeance 32 GB (2x16) DDR5 6000 MHz",
+      "categoria": "RAM",
+      "marca": "Corsair",
+      "precioCOP": 699000,
+      "stock": 9,
+      "specs": { "ramType": "DDR5", "capacidadGB": 32, "velocidadMHz": 6000, "tdpW": 10 }
+    },
+    {
+      "id": "mb-a520m-k",
+      "nombre": "Board ASUS Prime A520M-K (AM4, DDR4, Micro-ATX)",
+      "categoria": "MOTHERBOARD",
+      "marca": "ASUS",
+      "precioCOP": 339000,
+      "stock": 10,
+      "specs": { "socket": "AM4", "ramType": "DDR4", "formFactor": "mATX", "tdpW": 25 }
+    },
+    {
+      "id": "mb-b760m-ddr4",
+      "nombre": "Board MSI PRO B760M-A DDR4 WiFi (LGA1700, DDR4, Micro-ATX)",
+      "categoria": "MOTHERBOARD",
+      "marca": "MSI",
+      "precioCOP": 649000,
+      "stock": 6,
+      "specs": { "socket": "LGA1700", "ramType": "DDR4", "formFactor": "mATX", "tdpW": 30 }
+    },
+    {
+      "id": "mb-b650m-gaming",
+      "nombre": "Board Gigabyte B650M Gaming X AX (AM5, DDR5, Micro-ATX)",
+      "categoria": "MOTHERBOARD",
+      "marca": "Gigabyte",
+      "precioCOP": 789000,
+      "stock": 7,
+      "specs": { "socket": "AM5", "ramType": "DDR5", "formFactor": "mATX", "tdpW": 30 }
+    },
+    {
+      "id": "mb-z790-tuf",
+      "nombre": "Board ASUS TUF Gaming Z790-Plus WiFi (LGA1700, DDR5, ATX)",
+      "categoria": "MOTHERBOARD",
+      "marca": "ASUS",
+      "precioCOP": 1299000,
+      "stock": 3,
+      "specs": { "socket": "LGA1700", "ramType": "DDR5", "formFactor": "ATX", "tdpW": 40 }
+    },
+    {
+      "id": "psu-cv550",
+      "nombre": "Fuente Corsair CV550 550 W 80 Plus Bronze",
+      "categoria": "PSU",
+      "marca": "Corsair",
+      "precioCOP": 269000,
+      "stock": 15,
+      "specs": { "psuWatts": 550, "certificacion": "80 Plus Bronze" }
+    },
+    {
+      "id": "psu-a650bn",
+      "nombre": "Fuente MSI MAG A650BN 650 W 80 Plus Bronze",
+      "categoria": "PSU",
+      "marca": "MSI",
+      "precioCOP": 309000,
+      "stock": 12,
+      "specs": { "psuWatts": 650, "certificacion": "80 Plus Bronze" }
+    },
+    {
+      "id": "psu-rm850e",
+      "nombre": "Fuente Corsair RM850e 850 W 80 Plus Gold (modular)",
+      "categoria": "PSU",
+      "marca": "Corsair",
+      "precioCOP": 579000,
+      "stock": 6,
+      "specs": { "psuWatts": 850, "certificacion": "80 Plus Gold" }
+    },
+    {
+      "id": "ssd-nv3-1tb",
+      "nombre": "SSD Kingston NV3 1 TB NVMe PCIe 4.0",
+      "categoria": "STORAGE",
+      "marca": "Kingston",
+      "precioCOP": 279000,
+      "stock": 25,
+      "specs": { "capacidadGB": 1000, "interfaz": "NVMe PCIe 4.0", "tdpW": 6 }
+    },
+    {
+      "id": "ssd-990evo-2tb",
+      "nombre": "SSD Samsung 990 EVO Plus 2 TB NVMe PCIe 4.0",
+      "categoria": "STORAGE",
+      "marca": "Samsung",
+      "precioCOP": 649000,
+      "stock": 8,
+      "specs": { "capacidadGB": 2000, "interfaz": "NVMe PCIe 4.0", "tdpW": 8 }
+    },
+    {
+      "id": "case-versa-h18",
+      "nombre": "Chasis Thermaltake Versa H18 (Micro-ATX)",
+      "categoria": "CASE",
+      "marca": "Thermaltake",
+      "precioCOP": 199000,
+      "stock": 10,
+      "specs": { "formFactor": "mATX", "formatosSoportados": ["mATX", "Mini-ITX"] }
+    },
+    {
+      "id": "case-3000d-airflow",
+      "nombre": "Chasis Corsair 3000D Airflow (ATX)",
+      "categoria": "CASE",
+      "marca": "Corsair",
+      "precioCOP": 439000,
+      "stock": 6,
+      "specs": { "formFactor": "ATX", "formatosSoportados": ["ATX", "mATX", "Mini-ITX"] }
+    },
+    {
+      "id": "cooler-ak400",
+      "nombre": "Disipador por aire DeepCool AK400",
+      "categoria": "COOLER",
+      "marca": "DeepCool",
+      "precioCOP": 159000,
+      "stock": 14,
+      "specs": { "socketsSoportados": ["AM4", "AM5", "LGA1700"], "tdpMaxW": 220, "tdpW": 3 }
+    },
+    {
+      "id": "cooler-lf3-360",
+      "nombre": "Refrigeración líquida Arctic Liquid Freezer III 360",
+      "categoria": "COOLER",
+      "marca": "Arctic",
+      "precioCOP": 529000,
+      "stock": 0,
+      "specs": { "socketsSoportados": ["AM4", "AM5", "LGA1700"], "tdpMaxW": 300, "tdpW": 12 }
+    }
+  ]
+}
