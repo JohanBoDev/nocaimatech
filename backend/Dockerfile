@@ -17,9 +17,16 @@ COPY backend/tsconfig.json backend/
 COPY backend/src backend/src
 RUN npm run build -w backend
 # RDS exige TLS y su CA no viene en Alpine: sin este bundle no se puede verificar
-# el certificado del servidor (ver DATABASE_URL en el README).
-RUN mkdir -p /app/certs && \
-    wget -qO /app/certs/rds-ca.pem https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
+# el certificado del servidor (ver DATABASE_URL en el README). El motor de Prisma 6
+# solo lee el PRIMER certificado de un PEM, así que del bundle de la región se
+# extrae la raíz que usa la instancia (CACertificateIdentifier de atlas-db).
+ARG RDS_REGION=us-east-1
+ARG RDS_CA_SUBJECT="RSA2048 G1"
+RUN mkdir -p /app/certs && cd /app/certs && \
+    wget -qO bundle.pem https://truststore.pki.rds.amazonaws.com/$RDS_REGION/$RDS_REGION-bundle.pem && \
+    awk '/BEGIN CERT/{n++} {print > ("c" n ".pem")}' bundle.pem && \
+    for f in c*.pem; do openssl x509 -noout -subject -in "$f" | grep -q "$RDS_CA_SUBJECT" && cp "$f" rds-ca.pem; done; \
+    rm -f c*.pem bundle.pem && test -s rds-ca.pem
 
 # --- runtime: solo dependencias de producción ---
 FROM node:22-alpine
