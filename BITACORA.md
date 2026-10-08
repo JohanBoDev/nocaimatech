@@ -144,8 +144,11 @@ npm run dev                           # http://localhost:4000/api/health
 
 - [ ] Probar el cotizador con una `ANTHROPIC_API_KEY` real y ajustar el system
       prompt según las respuestas (`backend/src/chat/prompt.ts`).
-- [ ] Poner `ANTHROPIC_API_KEY` en `~/nocaimatech/backend/.env` de la EC2 y
-      `docker compose -f docker-compose.prod.yml up -d` (recrea el contenedor).
+- [ ] Cotizador en producción: el `.env` de la EC2 ya tiene una clave
+      `sk-ant-usr-…` y `MODEL_CHAT=claude-haiku-4-5` (el más barato, pedido por
+      Johan; `CHAT_EFFORT` vacío porque Haiku 4.5 no acepta effort). La API la
+      rechaza sin `anthropic-workspace-id` → falta poner `ANTHROPIC_WORKSPACE_ID`
+      (o cambiar a una clave de workspace) y `docker compose ... up -d`.
 - [ ] Revisar precios/stock reales del catálogo antes del lanzamiento.
 - [ ] `npm audit`: 3 alertas *high* en `deepmerge-ts` (dependencia interna del
       CLI de Prisma 6, no expuesta a usuarios). Revisar al subir de versión de Prisma.
