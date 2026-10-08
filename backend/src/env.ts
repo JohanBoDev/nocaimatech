@@ -8,6 +8,8 @@ const EnvSchema = z.object({
   // Opcionales al arrancar: sin API key la landing y la lista de espera funcionan,
   // y /api/chat responde con un error amigable.
   ANTHROPIC_API_KEY: z.string().optional(),
+  // Solo para claves que no están ligadas a un workspace (p. ej. sk-ant-usr-…).
+  ANTHROPIC_WORKSPACE_ID: z.string().optional(),
   MODEL_CHAT: z.string().min(1).default("claude-opus-5-5"),
   // Nivel de esfuerzo del modelo (low | medium | high). Vacío = valor por defecto del modelo.
   CHAT_EFFORT: z.enum(["low", "medium", "high", ""]).default("low"),

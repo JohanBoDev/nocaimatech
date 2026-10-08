@@ -18,7 +18,12 @@ const MODELOS_CON_FALLBACK = new Set(["claude-fable-5-1", "claude-opus-5-5", "cl
 
 let client: Anthropic | null = null;
 function getClient() {
-  client ??= new Anthropic({ apiKey: env.ANTHROPIC_API_KEY, maxRetries: 2 });
+  client ??= new Anthropic({
+    apiKey: env.ANTHROPIC_API_KEY,
+    maxRetries: 2,
+    // Las claves no ligadas a un workspace exigen indicarlo en cada petición.
+    ...(env.ANTHROPIC_WORKSPACE_ID ? { defaultHeaders: { "anthropic-workspace-id": env.ANTHROPIC_WORKSPACE_ID } } : {}),
+  });
   return client;
 }
 
